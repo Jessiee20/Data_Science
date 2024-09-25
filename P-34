@@ -1,0 +1,57 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.preprocessing import StandardScaler
+
+# Load the patient dataset (replace 'patient_data.csv' with your actual dataset file)
+data = pd.read_csv('patient_data.csv')
+
+# Display the first few rows of the dataset
+print(data.head())
+
+# Map the target variable to numerical values
+data['outcome'] = data['outcome'].map({'Good': 1, 'Bad': 0})
+
+# Select features and target variable
+features = ['age', 'gender', 'blood_pressure', 'cholesterol']  # Adjust as needed
+target = 'outcome'
+
+# Prepare the features and target variable
+X = data[features]
+y = data[target]
+
+# Encode categorical variables if needed
+X = pd.get_dummies(X, columns=['gender'], drop_first=True)
+
+# Standardize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# Create and fit the KNN model
+k = 5  # You can adjust the number of neighbors
+model = KNeighborsClassifier(n_neighbors=k)
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate the model's performance
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+
+# Output the evaluation metrics
+print(f'Accuracy: {accuracy:.2f}')
+print(f'Precision: {precision:.2f}')
+print(f'Recall: {recall:.2f}')
+print(f'F1 Score: {f1:.2f}')
+
+# Display detailed classification report
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
