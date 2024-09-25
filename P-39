@@ -1,0 +1,55 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# Load the transaction data from CSV (replace 'transaction_data.csv' with your actual dataset file)
+# The dataset should have columns: 'CustomerID', 'TotalAmountSpent', 'NumberOfItemsPurchased'
+data = pd.read_csv('transaction_data.csv')
+
+# Display the first few rows of the dataset
+print(data.head())
+
+# Select features for clustering
+X = data[['TotalAmountSpent', 'NumberOfItemsPurchased']]
+
+# Standardize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Determine the optimal number of clusters using the Elbow method
+inertia = []
+k_values = range(1, 11)
+for k in k_values:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(X_scaled)
+    inertia.append(kmeans.inertia_)
+
+# Plot the Elbow method results
+plt.figure(figsize=(10, 6))
+plt.plot(k_values, inertia, marker='o')
+plt.title('Elbow Method for Optimal k')
+plt.xlabel('Number of Clusters (k)')
+plt.ylabel('Inertia')
+plt.xticks(k_values)
+plt.grid()
+plt.show()
+
+# Based on the Elbow method, choose the number of clusters (e.g., k=3)
+k = 3
+kmeans = KMeans(n_clusters=k, random_state=42)
+data['Cluster'] = kmeans.fit_predict(X_scaled)
+
+# Visualize the clusters
+plt.figure(figsize=(10, 6))
+plt.scatter(data['TotalAmountSpent'], data['NumberOfItemsPurchased'], c=data['Cluster'], cmap='viridis', marker='o')
+plt.title('Customer Segments based on Spending and Purchase Behavior')
+plt.xlabel('Total Amount Spent')
+plt.ylabel('Number of Items Purchased')
+plt.colorbar(label='Cluster')
+plt.grid()
+plt.show()
+# Display the mean spending and purchase behavior for each cluster
+cluster_summary = data.groupby('Cluster')[['TotalAmountSpent', 'NumberOfItemsPurchased']].mean().reset_index()
+print("\nCluster Summary:")
+print(cluster_summary)
