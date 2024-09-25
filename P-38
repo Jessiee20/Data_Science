@@ -1,0 +1,38 @@
+import pandas as pd
+
+# Load the temperature data from CSV (replace 'temperature_data.csv' with your actual dataset file)
+# The dataset should have columns: 'City', 'Date', 'Temperature'
+data = pd.read_csv('temperature_data.csv')
+
+# Display the first few rows of the dataset
+print(data.head())
+
+# Calculate mean temperature for each city
+mean_temperatures = data.groupby('City')['Temperature'].mean().reset_index()
+mean_temperatures.rename(columns={'Temperature': 'Mean_Temperature'}, inplace=True)
+
+# Calculate standard deviation of temperature for each city
+std_temperatures = data.groupby('City')['Temperature'].std().reset_index()
+std_temperatures.rename(columns={'Temperature': 'Std_Deviation'}, inplace=True)
+
+# Merge mean and standard deviation dataframes
+stats = pd.merge(mean_temperatures, std_temperatures, on='City')
+
+# Determine the city with the highest temperature range
+data['Temperature_Range'] = data.groupby('City')['Temperature'].transform(lambda x: x.max() - x.min())
+city_highest_range = data.groupby('City')['Temperature_Range'].max().reset_index()
+city_highest_range = city_highest_range.loc[city_highest_range['Temperature_Range'].idxmax()]
+
+# Find the city with the most consistent temperature (lowest standard deviation)
+most_consistent_city = stats.loc[stats['Std_Deviation'].idxmin()]
+
+# Display results
+print("\nMean and Standard Deviation of Temperatures for Each City:")
+print(stats)
+
+print("\nCity with the Highest Temperature Range:")
+print(city_highest_range)
+
+print("\nCity with the Most Consistent Temperature (Lowest Standard Deviation):")
+print(most_consistent_city)
+
