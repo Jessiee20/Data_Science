@@ -1,0 +1,54 @@
+various plotting functions to visualize this relationship effectively. 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Sample data creation (replace this with your actual dataset)
+# data = pd.read_csv('student_data.csv')  # Uncomment to load from a CSV file
+data = pd.DataFrame({
+    'Study_Hours': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'Exam_Scores': [55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+})
+
+# Display the first few rows of the dataset
+print(data.head())
+
+# Calculate the correlation coefficient
+correlation = data['Study_Hours'].corr(data['Exam_Scores'])
+print(f'Correlation Coefficient: {correlation:.2f}')
+
+# Scatter plot
+plt.figure(figsize=(10, 6))
+plt.scatter(data['Study_Hours'], data['Exam_Scores'], color='blue')
+plt.title('Scatter Plot of Study Hours vs Exam Scores')
+plt.xlabel('Study Hours')
+plt.ylabel('Exam Scores')
+plt.grid()
+plt.show()
+
+# Linear regression plot using seaborn
+plt.figure(figsize=(10, 6))
+sns.regplot(x='Study_Hours', y='Exam_Scores', data=data, color='orange', marker='o')
+plt.title('Study Hours vs Exam Scores with Regression Line')
+plt.xlabel('Study Hours')
+plt.ylabel('Exam Scores')
+plt.grid()
+plt.show()
+
+# Box plot to explore score distribution based on study hours
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='Study_Hours', y='Exam_Scores', data=data, palette='Set3')
+plt.title('Box Plot of Exam Scores by Study Hours')
+plt.xlabel('Study Hours')
+plt.ylabel('Exam Scores')
+plt.grid()
+plt.show()
+
+# Heatmap to visualize correlation matrix (for larger datasets)
+correlation_matrix = data.corr()
+plt.figure(figsize=(8, 6))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Correlation Heatmap')
+plt.show()
+
