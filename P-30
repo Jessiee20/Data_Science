@@ -1,0 +1,50 @@
+import pandas as pd
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.tree import export_text
+
+# Load the car dataset (replace 'used_cars.csv' with your actual dataset file)
+data = pd.read_csv('used_cars.csv')
+
+# Assume the dataset has relevant features for prediction (e.g., 'mileage', 'age', 'brand', 'engine_type', 'price')
+features = ['mileage', 'age', 'brand', 'engine_type']
+target = 'price'
+
+# Prepare the features and target variable
+X = data[features]
+y = data[target]
+
+# Convert categorical features to numerical (if any)
+X = pd.get_dummies(X, drop_first=True)
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the Decision Tree Regressor (CART)
+model = DecisionTreeRegressor(random_state=42)
+model.fit(X_train, y_train)
+
+# Input new car features
+mileage = float(input("Enter the mileage of the car: "))
+age = float(input("Enter the age of the car: "))
+brand = input("Enter the brand of the car: ")
+engine_type = input("Enter the engine type of the car: ")
+
+# Create a DataFrame for the new car
+new_car = pd.DataFrame([[mileage, age, brand, engine_type]], columns=features)
+new_car = pd.get_dummies(new_car, drop_first=True)
+
+# Align new car DataFrame with training data (fill missing columns with 0)
+new_car = new_car.reindex(columns=X.columns, fill_value=0)
+
+# Predict the price for the new car
+predicted_price = model.predict(new_car)[0]
+
+# Output the predicted price
+print(f"The predicted price of the car is: ${predicted_price:.2f}")
+
+# Display the decision path
+decision_tree_text = export_text(model, feature_names=list(X.columns))
+print("\nDecision path for the prediction:\n")
+print(decision_tree_text)
+
